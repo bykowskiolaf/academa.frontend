@@ -10,8 +10,8 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { GOOGLE_LOGIN, LOGIN } from '@/config/URLS';
-import { Axios } from '@/utils/axios';
-import { Link, redirect, useNavigate, useSearch } from '@tanstack/react-router';
+import { Axios } from '@/utils/Axios';
+import { Link, useNavigate, useSearch } from '@tanstack/react-router';
 import axios from 'axios';
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
@@ -27,13 +27,18 @@ const LoginPage = () => {
     register,
     handleSubmit,
     formState: { errors }
-  } = useForm<LoginForm>();
-
-  const { reason } = useSearch({
-    from: '/login'
+  } = useForm<LoginForm>({
+    defaultValues: {
+      email: 'test@register.pl',
+      password: 'asd123'
+    }
   });
 
-  const navigate = useNavigate({ from: '/login' });
+  const { reason } = useSearch({
+    from: '/auth/login'
+  });
+
+  const navigate = useNavigate({ from: '/auth/login' });
 
   const onSubmit = (data: LoginForm) => {
     toast
@@ -53,6 +58,8 @@ const LoginPage = () => {
   useEffect(() => {
     if (reason === 'logged-out') {
       toast.info('You were logged-out successfully.');
+    } else if (reason === 'session-expired') {
+      toast.error('Your session has expired. Please login again.');
     }
   }, [reason]);
 
@@ -115,7 +122,7 @@ const LoginPage = () => {
               </div>
               <div className="mt-4 text-center text-sm">
                 Don&apos;t have an account?{' '}
-                <Link href="#" className="underline">
+                <Link to="/auth/register" className="underline">
                   Sign up
                 </Link>
               </div>

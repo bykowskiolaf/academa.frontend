@@ -14,7 +14,7 @@ import {
   useSidebar
 } from '@/components/ui/sidebar';
 import { LOGOUT } from '@/config/URLS';
-import { Axios } from '@/utils/axios';
+import { Axios } from '@/utils/Axios';
 import { CaretSortIcon } from '@radix-ui/react-icons';
 import { LogOut } from 'lucide-react';
 import { toast } from 'react-toastify';
@@ -34,7 +34,7 @@ export function NavUser({
     toast.promise(
       Axios.post(LOGOUT()).then(() => {
         localStorage.removeItem('user');
-        window.location.href = '/login?reason=logged-out';
+        window.location.href = '/auth/login?reason=logged-out';
       }),
       {
         pending: 'Logging out...',
