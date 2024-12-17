@@ -1,15 +1,27 @@
 import useCourses from '@/hooks/useCourses/useCourses';
 import { Link, useParams } from '@tanstack/react-router';
 import { LoaderIcon } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import CourseActionButton from './components/CourseActionButton';
 
 const CoursePage = () => {
   const { courseUuid } = useParams({
-    from: '/_dashboard/courses/$courseUuid'
+    from: '/_dashboard/course/$courseUuid'
   });
 
-  const { course, coursesIsLoading, coursesError } = useCourses({
+  const {
+    course,
+    enrolledCourses,
+    refetchEnrolledCourses,
+    coursesIsLoading,
+    coursesError
+  } = useCourses({
     uuid: courseUuid
   });
+
+  const [isEnrolled, setIsEnrolled] = useState(
+    enrolledCourses.some(enrolledCourse => enrolledCourse.uuid === courseUuid)
+  );
 
   if (coursesIsLoading) {
     return (
@@ -27,6 +39,13 @@ const CoursePage = () => {
       </div>
     );
   }
+
+  useEffect(() => {
+    setIsEnrolled(
+      enrolledCourses.some(enrolledCourse => enrolledCourse.uuid === courseUuid)
+    );
+    console.log(enrolledCourses, courseUuid);
+  }, [enrolledCourses, courseUuid]);
 
   return (
     <div className="w-full text-foreground">
@@ -55,29 +74,17 @@ const CoursePage = () => {
         <h2 className="text-xl font-bold dela-gothic mb-4">
           About this course
         </h2>
-        <p className="mb-6">
-          {/* Additional details about the course could go here. 
-              Since we only have name/description, we’re just reusing them.
-              In a real scenario, include more fields like instructor, duration, 
-              start date, syllabus, etc. */}
-          {course.longDescription}
-        </p>
+        <p className="mb-6">{course.longDescription}</p>
 
-        {/* Example additional fields (remove or adjust as needed): */}
-        {/* <h3 className="text-lg font-semibold mb-2 dela-gothic">Instructor</h3>
-        <p className="mb-4">John Doe</p>
-
-        <h3 className="text-lg font-semibold mb-2 dela-gothic">Duration</h3>
-        <p className="mb-4">10 weeks</p>
-
-        <h3 className="text-lg font-semibold mb-2 dela-gothic">Start Date</h3>
-        <p className="mb-4">January 10, 2025</p> */}
-
-        {/* Back Link or other navigation */}
-        <div className="mt-8">
+        <div className="flex justify-between items-center mt-8">
           <Link to="/courses" className="text-primary hover:underline">
             &larr; Back to Courses
           </Link>
+          <CourseActionButton
+            isEnrolled={isEnrolled}
+            callback={refetchEnrolledCourses}
+            course={course}
+          />
         </div>
       </div>
     </div>

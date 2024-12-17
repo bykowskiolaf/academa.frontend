@@ -1,12 +1,12 @@
-import { COURSE } from '@/config/URLS';
+import { ENROLLED_COURSES } from '@/config/URLS';
 import { Axios } from '@/utils/Axios';
 import { queryOptions } from '@tanstack/react-query';
 
-export const courseQueryOptions = ({ uuid }: { uuid: string }) =>
+export const enrolledCoursesQueryOptions = () =>
   queryOptions({
-    queryKey: ['course', uuid],
+    queryKey: ['enrolledCourses'],
     queryFn: async () =>
-      Axios.get<Course>(COURSE(uuid))
+      Axios.get<Course[]>(ENROLLED_COURSES())
         .then(res => res.data)
         .catch(err => {
           console.error(err);

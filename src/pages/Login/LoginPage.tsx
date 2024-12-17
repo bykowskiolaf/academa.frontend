@@ -29,7 +29,7 @@ const LoginPage = () => {
     formState: { errors }
   } = useForm<LoginForm>({
     defaultValues: {
-      email: 'test@register.pl',
+      email: 'student@bykowski.dev',
       password: 'asd123'
     }
   });
@@ -50,7 +50,7 @@ const LoginPage = () => {
       .then(res => {
         localStorage.setItem('user', JSON.stringify(res.data));
         navigate({
-          to: '/'
+          to: '/home'
         });
       });
   };

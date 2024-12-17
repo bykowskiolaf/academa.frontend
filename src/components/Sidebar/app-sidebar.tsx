@@ -12,6 +12,7 @@ import {
 import { GraduationCap, Send } from 'lucide-react';
 import * as React from 'react';
 
+import { Link } from '@tanstack/react-router';
 import { NavUser } from './nav-user';
 import logoUrl from '/logo.svg?url';
 
@@ -29,10 +30,10 @@ const data = {
       url: '/courses',
       icon: GraduationCap,
       isActive: true,
-      items: [
+      items: user.role === 'STUDENT' && [
         {
           title: 'My courses',
-          url: '#'
+          url: '/courses/enrolled'
         }
       ]
     }
@@ -54,14 +55,14 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <SidebarMenu>
             <SidebarMenuItem>
               <SidebarMenuButton size="lg" asChild>
-                <a href="#">
+                <Link to="/home">
                   <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
                     <img src={logoUrl} alt="Academa" className="w-8 h-8" />
                   </div>
                   <div className="grid flex-1 text-left text-sm leading-tight">
                     <span className="truncate font-semibold">Academa</span>
                   </div>
-                </a>
+                </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
           </SidebarMenu>

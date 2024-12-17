@@ -47,7 +47,7 @@ const RegisterPage = () => {
     formState: { errors }
   } = useForm<RegisterForm>({
     defaultValues: {
-      email: 'test@register.pl',
+      email: 'student@bykowski.dev',
       password: 'asd123',
       confirmPassword: 'asd123',
       givenName: 'Harry',

@@ -8,29 +8,23 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
-import { createFileRoute } from '@tanstack/react-router'
-
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
+import { Route as DashboardImport } from './routes/_dashboard'
 import { Route as AuthRegisterImport } from './routes/auth/register'
 import { Route as AuthLoginImport } from './routes/auth/login'
+import { Route as DashboardHomeImport } from './routes/_dashboard/home'
 import { Route as DashboardCoursesIndexImport } from './routes/_dashboard/courses/index'
-import { Route as DashboardCoursesCourseUuidImport } from './routes/_dashboard/courses/$courseUuid'
-
-// Create Virtual Routes
-
-const DashboardIndexLazyImport = createFileRoute('/_dashboard/')()
+import { Route as DashboardCoursesEnrolledImport } from './routes/_dashboard/courses/enrolled'
+import { Route as DashboardCourseCourseUuidImport } from './routes/_dashboard/course.$courseUuid'
 
 // Create/Update Routes
 
-const DashboardIndexLazyRoute = DashboardIndexLazyImport.update({
-  id: '/_dashboard/',
-  path: '/',
+const DashboardRoute = DashboardImport.update({
+  id: '/_dashboard',
   getParentRoute: () => rootRoute,
-} as any).lazy(() =>
-  import('./routes/_dashboard/index.lazy').then((d) => d.Route),
-)
+} as any)
 
 const AuthRegisterRoute = AuthRegisterImport.update({
   id: '/auth/register',
@@ -44,24 +38,48 @@ const AuthLoginRoute = AuthLoginImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
-const DashboardCoursesIndexRoute = DashboardCoursesIndexImport.update({
-  id: '/_dashboard/courses/',
-  path: '/courses/',
-  getParentRoute: () => rootRoute,
+const DashboardHomeRoute = DashboardHomeImport.update({
+  id: '/home',
+  path: '/home',
+  getParentRoute: () => DashboardRoute,
 } as any)
 
-const DashboardCoursesCourseUuidRoute = DashboardCoursesCourseUuidImport.update(
-  {
-    id: '/_dashboard/courses/$courseUuid',
-    path: '/courses/$courseUuid',
-    getParentRoute: () => rootRoute,
-  } as any,
-)
+const DashboardCoursesIndexRoute = DashboardCoursesIndexImport.update({
+  id: '/courses/',
+  path: '/courses/',
+  getParentRoute: () => DashboardRoute,
+} as any)
+
+const DashboardCoursesEnrolledRoute = DashboardCoursesEnrolledImport.update({
+  id: '/courses/enrolled',
+  path: '/courses/enrolled',
+  getParentRoute: () => DashboardRoute,
+} as any)
+
+const DashboardCourseCourseUuidRoute = DashboardCourseCourseUuidImport.update({
+  id: '/course/$courseUuid',
+  path: '/course/$courseUuid',
+  getParentRoute: () => DashboardRoute,
+} as any)
 
 // Populate the FileRoutesByPath interface
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/_dashboard': {
+      id: '/_dashboard'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof DashboardImport
+      parentRoute: typeof rootRoute
+    }
+    '/_dashboard/home': {
+      id: '/_dashboard/home'
+      path: '/home'
+      fullPath: '/home'
+      preLoaderRoute: typeof DashboardHomeImport
+      parentRoute: typeof DashboardImport
+    }
     '/auth/login': {
       id: '/auth/login'
       path: '/auth/login'
@@ -76,96 +94,122 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthRegisterImport
       parentRoute: typeof rootRoute
     }
-    '/_dashboard/': {
-      id: '/_dashboard/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof DashboardIndexLazyImport
-      parentRoute: typeof rootRoute
+    '/_dashboard/course/$courseUuid': {
+      id: '/_dashboard/course/$courseUuid'
+      path: '/course/$courseUuid'
+      fullPath: '/course/$courseUuid'
+      preLoaderRoute: typeof DashboardCourseCourseUuidImport
+      parentRoute: typeof DashboardImport
     }
-    '/_dashboard/courses/$courseUuid': {
-      id: '/_dashboard/courses/$courseUuid'
-      path: '/courses/$courseUuid'
-      fullPath: '/courses/$courseUuid'
-      preLoaderRoute: typeof DashboardCoursesCourseUuidImport
-      parentRoute: typeof rootRoute
+    '/_dashboard/courses/enrolled': {
+      id: '/_dashboard/courses/enrolled'
+      path: '/courses/enrolled'
+      fullPath: '/courses/enrolled'
+      preLoaderRoute: typeof DashboardCoursesEnrolledImport
+      parentRoute: typeof DashboardImport
     }
     '/_dashboard/courses/': {
       id: '/_dashboard/courses/'
       path: '/courses'
       fullPath: '/courses'
       preLoaderRoute: typeof DashboardCoursesIndexImport
-      parentRoute: typeof rootRoute
+      parentRoute: typeof DashboardImport
     }
   }
 }
 
 // Create and export the route tree
 
+interface DashboardRouteChildren {
+  DashboardHomeRoute: typeof DashboardHomeRoute
+  DashboardCourseCourseUuidRoute: typeof DashboardCourseCourseUuidRoute
+  DashboardCoursesEnrolledRoute: typeof DashboardCoursesEnrolledRoute
+  DashboardCoursesIndexRoute: typeof DashboardCoursesIndexRoute
+}
+
+const DashboardRouteChildren: DashboardRouteChildren = {
+  DashboardHomeRoute: DashboardHomeRoute,
+  DashboardCourseCourseUuidRoute: DashboardCourseCourseUuidRoute,
+  DashboardCoursesEnrolledRoute: DashboardCoursesEnrolledRoute,
+  DashboardCoursesIndexRoute: DashboardCoursesIndexRoute,
+}
+
+const DashboardRouteWithChildren = DashboardRoute._addFileChildren(
+  DashboardRouteChildren,
+)
+
 export interface FileRoutesByFullPath {
+  '': typeof DashboardRouteWithChildren
+  '/home': typeof DashboardHomeRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
-  '/': typeof DashboardIndexLazyRoute
-  '/courses/$courseUuid': typeof DashboardCoursesCourseUuidRoute
+  '/course/$courseUuid': typeof DashboardCourseCourseUuidRoute
+  '/courses/enrolled': typeof DashboardCoursesEnrolledRoute
   '/courses': typeof DashboardCoursesIndexRoute
 }
 
 export interface FileRoutesByTo {
+  '': typeof DashboardRouteWithChildren
+  '/home': typeof DashboardHomeRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
-  '/': typeof DashboardIndexLazyRoute
-  '/courses/$courseUuid': typeof DashboardCoursesCourseUuidRoute
+  '/course/$courseUuid': typeof DashboardCourseCourseUuidRoute
+  '/courses/enrolled': typeof DashboardCoursesEnrolledRoute
   '/courses': typeof DashboardCoursesIndexRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
+  '/_dashboard': typeof DashboardRouteWithChildren
+  '/_dashboard/home': typeof DashboardHomeRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
-  '/_dashboard/': typeof DashboardIndexLazyRoute
-  '/_dashboard/courses/$courseUuid': typeof DashboardCoursesCourseUuidRoute
+  '/_dashboard/course/$courseUuid': typeof DashboardCourseCourseUuidRoute
+  '/_dashboard/courses/enrolled': typeof DashboardCoursesEnrolledRoute
   '/_dashboard/courses/': typeof DashboardCoursesIndexRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
+    | ''
+    | '/home'
     | '/auth/login'
     | '/auth/register'
-    | '/'
-    | '/courses/$courseUuid'
+    | '/course/$courseUuid'
+    | '/courses/enrolled'
     | '/courses'
   fileRoutesByTo: FileRoutesByTo
   to:
+    | ''
+    | '/home'
     | '/auth/login'
     | '/auth/register'
-    | '/'
-    | '/courses/$courseUuid'
+    | '/course/$courseUuid'
+    | '/courses/enrolled'
     | '/courses'
   id:
     | '__root__'
+    | '/_dashboard'
+    | '/_dashboard/home'
     | '/auth/login'
     | '/auth/register'
-    | '/_dashboard/'
-    | '/_dashboard/courses/$courseUuid'
+    | '/_dashboard/course/$courseUuid'
+    | '/_dashboard/courses/enrolled'
     | '/_dashboard/courses/'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
+  DashboardRoute: typeof DashboardRouteWithChildren
   AuthLoginRoute: typeof AuthLoginRoute
   AuthRegisterRoute: typeof AuthRegisterRoute
-  DashboardIndexLazyRoute: typeof DashboardIndexLazyRoute
-  DashboardCoursesCourseUuidRoute: typeof DashboardCoursesCourseUuidRoute
-  DashboardCoursesIndexRoute: typeof DashboardCoursesIndexRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
+  DashboardRoute: DashboardRouteWithChildren,
   AuthLoginRoute: AuthLoginRoute,
   AuthRegisterRoute: AuthRegisterRoute,
-  DashboardIndexLazyRoute: DashboardIndexLazyRoute,
-  DashboardCoursesCourseUuidRoute: DashboardCoursesCourseUuidRoute,
-  DashboardCoursesIndexRoute: DashboardCoursesIndexRoute,
 }
 
 export const routeTree = rootRoute
@@ -178,12 +222,23 @@ export const routeTree = rootRoute
     "__root__": {
       "filePath": "__root.tsx",
       "children": [
+        "/_dashboard",
         "/auth/login",
-        "/auth/register",
-        "/_dashboard/",
-        "/_dashboard/courses/$courseUuid",
+        "/auth/register"
+      ]
+    },
+    "/_dashboard": {
+      "filePath": "_dashboard.tsx",
+      "children": [
+        "/_dashboard/home",
+        "/_dashboard/course/$courseUuid",
+        "/_dashboard/courses/enrolled",
         "/_dashboard/courses/"
       ]
+    },
+    "/_dashboard/home": {
+      "filePath": "_dashboard/home.tsx",
+      "parent": "/_dashboard"
     },
     "/auth/login": {
       "filePath": "auth/login.tsx"
@@ -191,14 +246,17 @@ export const routeTree = rootRoute
     "/auth/register": {
       "filePath": "auth/register.tsx"
     },
-    "/_dashboard/": {
-      "filePath": "_dashboard/index.lazy.tsx"
+    "/_dashboard/course/$courseUuid": {
+      "filePath": "_dashboard/course.$courseUuid.ts",
+      "parent": "/_dashboard"
     },
-    "/_dashboard/courses/$courseUuid": {
-      "filePath": "_dashboard/courses/$courseUuid.ts"
+    "/_dashboard/courses/enrolled": {
+      "filePath": "_dashboard/courses/enrolled.tsx",
+      "parent": "/_dashboard"
     },
     "/_dashboard/courses/": {
-      "filePath": "_dashboard/courses/index.tsx"
+      "filePath": "_dashboard/courses/index.tsx",
+      "parent": "/_dashboard"
     }
   }
 }

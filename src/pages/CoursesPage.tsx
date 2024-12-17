@@ -74,6 +74,13 @@ const CoursesPage = () => {
             width: '100%',
             position: 'relative'
           }}>
+          {rowVirtualizer.getVirtualItems().length === 0 && (
+            <>
+              {coursesIsLoading && <LoaderIcon className="animate-spin" />}
+              {!coursesIsLoading && <p>No courses found.</p>}
+            </>
+          )}
+
           {rowVirtualizer.getVirtualItems().map(virtualRow => {
             const isLoaderRow = virtualRow.index > totalRows - 1;
             const startIndex = virtualRow.index * columns;
@@ -104,7 +111,7 @@ const CoursesPage = () => {
                   </div>
                 ) : (
                   <div
-                    className={`grid grid-cols-${columns} gap-4 h-full px-2 py-2 box-border`}>
+                    className={`grid grid-cols-2 gap-4 h-full px-2 py-2 box-border`}>
                     {rowCourses.map(course => (
                       <CourseCard key={course.uuid} course={course} />
                     ))}
@@ -127,7 +134,7 @@ const CourseCard = ({ course }: { course: Course }) => {
   if (!course) return null;
 
   return (
-    <Link to={`/courses/${course.uuid}`}>
+    <Link to={`/course/${course.uuid}`}>
       <div
         className="relative h-full rounded-lg overflow-hidden shadow-md bg-card text-card-foreground"
         style={
